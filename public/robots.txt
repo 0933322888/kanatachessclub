@@ -5,6 +5,7 @@ Allow: /auth/register
 Allow: /users/
 Allow: /learning
 Allow: /chess-for-kids
+Allow: /blog
 
 # Disallow admin and API routes
 Disallow: /admin/

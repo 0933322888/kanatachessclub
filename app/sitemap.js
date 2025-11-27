@@ -52,35 +52,31 @@ export default async function sitemap() {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
-  ];
-
-  // Optionally add dynamic pages (public user profiles)
-  // Uncomment and modify if you want to include public user profiles
-  /*
-  try {
-    const connectDB = (await import('../lib/mongodb')).default;
-    const User = (await import('../models/User')).default;
-    
-    await connectDB();
-    const publicUsers = await User.find({ 
-      // Add any filters for public profiles if needed
-    }).select('_id').limit(1000); // Limit to prevent sitemap from being too large
-    
-    const userPages = publicUsers.map(user => ({
-      url: `${baseUrl}/users/${user._id}`,
+    {
+      url: `${baseUrl}/blog`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.6,
+      priority: 0.9,
+    },
+  ];
+
+  // Add blog post pages dynamically
+  try {
+    const { getAllBlogPosts } = await import('../lib/blog-posts');
+    const blogPosts = getAllBlogPosts();
+    
+    const blogPostPages = blogPosts.map(post => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: new Date(post.date),
+      changeFrequency: 'monthly',
+      priority: 0.7,
     }));
     
-    return [...staticPages, ...userPages];
+    return [...staticPages, ...blogPostPages];
   } catch (error) {
-    console.error('Error generating sitemap:', error);
-    // Return static pages if database query fails
+    console.error('Error generating blog posts for sitemap:', error);
+    // Return static pages if blog posts can't be loaded
     return staticPages;
   }
-  */
-
-  return staticPages;
 }
 
