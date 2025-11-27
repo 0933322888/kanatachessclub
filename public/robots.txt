@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+Allow: /auth/login
+Allow: /auth/register
+Allow: /users/
+Allow: /learning
+Allow: /chess-for-kids
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+
+# Disallow protected routes that require authentication
+Disallow: /profile
+Disallow: /next-gathering
+Disallow: /tournaments
+
+# Sitemap location (Next.js will serve this at /sitemap.xml)
+Sitemap: /sitemap.xml
+

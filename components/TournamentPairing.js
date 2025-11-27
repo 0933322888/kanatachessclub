@@ -78,18 +78,18 @@ export default function TournamentPairing({ tournament, isAdmin }) {
         <p className="text-whisky-700 mb-4">No participants registered yet. Participants can register on the home page.</p>
       ) : (
         <div className="space-y-4">
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:space-x-4">
             <button
               onClick={handleGeneratePairings}
               disabled={loading || !canGeneratePairings}
-              className="px-4 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Generating...' : 'Generate Pairings (Auto)'}
             </button>
             <button
               onClick={() => setShowManualPairing(!showManualPairing)}
               disabled={!canGeneratePairings}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 shadow-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {showManualPairing ? 'Cancel Manual Pairing' : 'Manual Pairing'}
             </button>
@@ -235,13 +235,13 @@ function ManualPairingForm({ tournament, onSave }) {
         {firstRoundMatchesList.map((match, index) => {
           const matchIndex = matches.indexOf(match);
           return (
-            <div key={index} className="flex items-center space-x-4 p-3 bg-whisky-50 rounded border border-whisky-300">
-              <span className="font-medium text-whisky-800 w-20">Match {match.matchNumber}:</span>
+            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:space-x-4 p-3 bg-whisky-50 rounded border border-whisky-300">
+              <span className="font-medium text-whisky-800 sm:w-20">Match {match.matchNumber}:</span>
               
               <select
                 value={match.player1 || ''}
                 onChange={(e) => handlePlayerChange(matchIndex, 'player1', e.target.value)}
-                className="flex-1 px-3 py-2 border border-whisky-300 rounded-md bg-white"
+                className="flex-1 px-3 py-2 border border-whisky-300 rounded-md bg-white text-sm sm:text-base"
               >
                 <option value="">Select Player 1</option>
                 {tournament.participants.map((p) => (
@@ -253,12 +253,12 @@ function ManualPairingForm({ tournament, onSave }) {
                 ))}
               </select>
 
-              <span className="text-whisky-700 font-medium">vs</span>
+              <span className="text-whisky-700 font-medium text-center sm:text-left">vs</span>
 
               <select
                 value={match.player2 || ''}
                 onChange={(e) => handlePlayerChange(matchIndex, 'player2', e.target.value)}
-                className="flex-1 px-3 py-2 border border-whisky-300 rounded-md bg-white"
+                className="flex-1 px-3 py-2 border border-whisky-300 rounded-md bg-white text-sm sm:text-base"
               >
                 <option value="">Select Player 2</option>
                 {tournament.participants.map((p) => (
@@ -274,11 +274,11 @@ function ManualPairingForm({ tournament, onSave }) {
         })}
       </div>
 
-      <div className="mt-6 flex justify-end space-x-4">
+      <div className="mt-6 flex justify-end">
         <button
           onClick={handleSave}
           disabled={loading}
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 font-medium"
+          className="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 font-medium"
         >
           {loading ? 'Saving...' : 'Save Pairings'}
         </button>

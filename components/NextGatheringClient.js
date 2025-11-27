@@ -349,18 +349,18 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
       )}
 
       <div className="bg-whisky-50 rounded-lg shadow-lg border-2 border-whisky-200 p-6 mb-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-whisky-900 mb-2">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+          <div className="flex-1">
+            <h2 className="text-xl sm:text-2xl font-semibold text-whisky-900 mb-2">
               {formatDate(nextGathering)}
             </h2>
-            <p className="text-lg text-whisky-800 mb-2 font-medium">
+            <p className="text-base sm:text-lg text-whisky-800 mb-2 font-medium">
               {gatheringTime}
             </p>
-            <p className="text-whisky-700 mb-2">Biweekly gathering - every second Wednesday</p>
+            <p className="text-sm sm:text-base text-whisky-700 mb-2">Biweekly gathering - every second Wednesday</p>
             <div className="mt-3">
               <p className="text-sm font-medium text-whisky-800 mb-1">📍 Location:</p>
-              <p className="text-whisky-700 mb-3">{gatheringLocation}</p>
+              <p className="text-whisky-700 mb-3 break-words">{gatheringLocation}</p>
               {gatheringCoordinates && (
                 <div className="mt-4">
                   <LocationMap
@@ -375,7 +375,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
           <button
             onClick={handleToggleAttendance}
             disabled={loading.attendance}
-            className={`px-6 py-2 rounded-md shadow-md font-medium transition-colors ${
+            className={`w-full sm:w-auto px-6 py-2 rounded-md shadow-md font-medium transition-colors whitespace-nowrap ${
               attending
                 ? 'bg-amber text-white hover:bg-amber-dark'
                 : 'bg-whisky-200 text-whisky-800 hover:bg-whisky-300 border-2 border-whisky-300'

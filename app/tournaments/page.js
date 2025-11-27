@@ -5,6 +5,15 @@ import connectDB from '../../lib/mongodb';
 import Tournament from '../../models/Tournament';
 import Link from 'next/link';
 
+export const metadata = {
+  title: 'Tournaments',
+  description: 'View all chess tournaments organized by Kanata Chess Club. Register for upcoming tournaments, view brackets, and track results.',
+  openGraph: {
+    title: 'Tournaments | Kanata Chess Club',
+    description: 'View all chess tournaments organized by Kanata Chess Club. Register for upcoming tournaments, view brackets, and track results.',
+  },
+};
+
 export default async function TournamentsPage() {
   const session = await getServerSession(authOptions);
   
@@ -21,12 +30,15 @@ export default async function TournamentsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-whisky-900">Tournaments</h1>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <div className="flex items-center space-x-3">
+          <span className="text-3xl sm:text-4xl">🏆</span>
+          <h1 className="text-2xl sm:text-3xl font-bold text-whisky-900">Tournaments</h1>
+        </div>
         {session.user.role === 'admin' && (
           <Link
             href="/admin/tournaments/create"
-            className="px-4 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium"
+            className="px-4 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium text-center sm:text-left whitespace-nowrap"
           >
             Create Tournament
           </Link>
@@ -53,9 +65,12 @@ export default async function TournamentsPage() {
               href={`/tournaments/${tournament._id}`}
               className="bg-whisky-50 rounded-lg shadow-lg border-2 border-whisky-200 p-6 hover:border-amber hover:shadow-xl transition-all"
             >
-              <h2 className="text-xl font-semibold text-whisky-900 mb-2">
-                {tournament.name}
-              </h2>
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="text-2xl">♟️</span>
+                <h2 className="text-xl font-semibold text-whisky-900">
+                  {tournament.name}
+                </h2>
+              </div>
               <p className="text-sm text-whisky-700 mb-2">
                 Type: {tournament.type === 'single' ? 'Single Elimination' : 'Double Elimination'}
               </p>

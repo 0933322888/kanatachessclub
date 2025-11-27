@@ -272,13 +272,13 @@ function MatchCard({ match, isAdmin, onUpdate, loading }) {
             </button>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-2">
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="number"
                   value={score1}
                   onChange={(e) => setScore1(e.target.value)}
                   placeholder="Score 1"
-                  className="w-full px-2 py-1 text-sm border-2 border-whisky-300 rounded-md bg-white text-whisky-900 focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
+                  className="flex-1 px-2 py-1 text-sm border-2 border-whisky-300 rounded-md bg-white text-whisky-900 focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
                   required
                 />
                 <input
@@ -286,7 +286,7 @@ function MatchCard({ match, isAdmin, onUpdate, loading }) {
                   value={score2}
                   onChange={(e) => setScore2(e.target.value)}
                   placeholder="Score 2"
-                  className="w-full px-2 py-1 text-sm border-2 border-whisky-300 rounded-md bg-white text-whisky-900 focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
+                  className="flex-1 px-2 py-1 text-sm border-2 border-whisky-300 rounded-md bg-white text-whisky-900 focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
                   required
                 />
               </div>

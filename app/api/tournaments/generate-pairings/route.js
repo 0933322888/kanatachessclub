@@ -5,6 +5,7 @@ import connectDB from '../../../../lib/mongodb';
 import Tournament from '../../../../models/Tournament';
 import User from '../../../../models/User';
 import { generateSingleEliminationBracket, generateDoubleEliminationBracket } from '../../../../lib/tournament';
+import { createNotificationsForUsers } from '../../../../lib/notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +84,21 @@ export async function POST(request) {
 
     tournament.matches = matches;
     await tournament.save();
+
+    // Notify all participants that pairings have been generated
+    if (tournament.participants && tournament.participants.length > 0) {
+      const participantIds = tournament.participants.map(p => 
+        typeof p === 'object' ? p._id.toString() : p.toString()
+      );
+      
+      await createNotificationsForUsers(participantIds, {
+        type: 'pairing_generated',
+        title: 'Tournament Pairings Generated',
+        message: `Pairings have been generated for "${tournament.name}". Check your bracket!`,
+        link: `/tournaments/${tournament._id}`,
+        tournament: tournament._id,
+      });
+    }
 
     return NextResponse.json({ 
       message: 'Pairings generated successfully',

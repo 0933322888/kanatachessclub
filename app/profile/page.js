@@ -13,12 +13,19 @@ export default async function ProfilePage() {
   }
 
   await connectDB();
-  const user = await User.findById(session.user.id).select('-password');
-
+  const user = await User.findById(session.user.id);
+  
   if (!user) {
     redirect('/auth/login');
   }
+  
+  // Check if user has a password (not OAuth user) for password change functionality
+  const hasPassword = user.password !== null && user.password !== undefined && user.provider !== 'google';
+  
+  // Remove password from user object before passing to client
+  const userForClient = user.toObject();
+  delete userForClient.password;
 
-  return <ProfileClient user={JSON.parse(JSON.stringify(user))} />;
+  return <ProfileClient user={JSON.parse(JSON.stringify(userForClient))} hasPassword={hasPassword} />;
 }
 

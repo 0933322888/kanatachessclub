@@ -142,7 +142,7 @@ export default function GatheringChat({ gatheringDate, currentUserId }) {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} className="flex space-x-2">
+      <form onSubmit={handleSendMessage} className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
         <input
           type="text"
           value={newMessage}
@@ -155,7 +155,7 @@ export default function GatheringChat({ gatheringDate, currentUserId }) {
         <button
           type="submit"
           disabled={loading || !newMessage.trim()}
-          className="px-6 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+          className="w-full sm:w-auto px-6 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium whitespace-nowrap"
         >
           {loading ? 'Sending...' : 'Send'}
         </button>

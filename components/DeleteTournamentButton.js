@@ -35,22 +35,24 @@ export default function DeleteTournamentButton({ tournamentId, tournamentName })
 
   if (showConfirm) {
     return (
-      <div className="flex items-center space-x-2">
-        <span className="text-sm text-whisky-700">Delete "{tournamentName}"?</span>
-        <button
-          onClick={handleDelete}
-          disabled={loading}
-          className="px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors font-medium"
-        >
-          {loading ? 'Deleting...' : 'Confirm'}
-        </button>
-        <button
-          onClick={() => setShowConfirm(false)}
-          disabled={loading}
-          className="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-400 disabled:opacity-50 transition-colors font-medium"
-        >
-          Cancel
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:space-x-2">
+        <span className="text-sm text-whisky-700 break-words">Delete "{tournamentName}"?</span>
+        <div className="flex gap-2">
+          <button
+            onClick={handleDelete}
+            disabled={loading}
+            className="flex-1 sm:flex-none px-3 py-1 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors font-medium"
+          >
+            {loading ? 'Deleting...' : 'Confirm'}
+          </button>
+          <button
+            onClick={() => setShowConfirm(false)}
+            disabled={loading}
+            className="flex-1 sm:flex-none px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-400 disabled:opacity-50 transition-colors font-medium"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     );
   }
@@ -58,7 +60,7 @@ export default function DeleteTournamentButton({ tournamentId, tournamentName })
   return (
     <button
       onClick={() => setShowConfirm(true)}
-      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow-md transition-colors font-medium"
+      className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 shadow-md transition-colors font-medium text-center sm:text-left whitespace-nowrap"
     >
       Delete Tournament
     </button>

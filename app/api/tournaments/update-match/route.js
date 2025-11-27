@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../lib/auth';
 import connectDB from '../../../../lib/mongodb';
 import Tournament from '../../../../models/Tournament';
+import User from '../../../../models/User';
+import { createNotification } from '../../../../lib/notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +85,48 @@ export async function POST(request) {
     }
 
     await tournament.save();
+
+    // Notify both players about the match result
+    const player1Id = match.player1?.toString();
+    const player2Id = match.player2?.toString();
+
+    if (player1Id && player2Id) {
+      // Get winner name
+      const winner = await User.findById(winnerId).select('firstName lastName');
+      const winnerName = winner ? `${winner.firstName} ${winner.lastName}` : null;
+
+      const notificationPromises = [player1Id, player2Id].map(async (playerId) => {
+        await createNotification({
+          userId: playerId,
+          type: 'match_result',
+          title: 'Match Result Updated',
+          message: `Your match in "${tournament.name}" has been completed. ${winnerName ? `Winner: ${winnerName}` : 'Check the bracket for details.'}`,
+          link: `/tournaments/${tournamentId}`,
+          tournamentId: tournament._id,
+        });
+      });
+      await Promise.all(notificationPromises);
+    }
+
+    // If tournament is completed, notify all participants
+    if (tournament.status === 'completed' && tournament.winner) {
+      const participantIds = tournament.participants.map(p => 
+        typeof p === 'object' ? p._id?.toString() : p.toString()
+      );
+      const winner = await User.findById(tournament.winner).select('firstName lastName');
+      const winnerName = winner ? `${winner.firstName} ${winner.lastName}` : null;
+
+      for (const participantId of participantIds) {
+        await createNotification({
+          userId: participantId,
+          type: 'tournament_started',
+          title: 'Tournament Completed',
+          message: `"${tournament.name}" has been completed. ${winnerName ? `Winner: ${winnerName}` : 'Check the results!'}`,
+          link: `/tournaments/${tournamentId}`,
+          tournamentId: tournament._id,
+        });
+      }
+    }
 
     return NextResponse.json({ message: 'Match updated successfully' });
   } catch (error) {

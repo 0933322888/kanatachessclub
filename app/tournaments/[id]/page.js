@@ -10,6 +10,40 @@ import { formatDate } from '../../../lib/utils';
 import { serializeTournament } from '../../../lib/serialize';
 import Link from 'next/link';
 
+export async function generateMetadata({ params }) {
+  await connectDB();
+  const tournament = await Tournament.findById(params.id)
+    .populate('participants', 'firstName lastName')
+    .populate('winner', 'firstName lastName');
+
+  if (!tournament) {
+    return {
+      title: 'Tournament Not Found',
+    };
+  }
+
+  const siteUrl = process.env.NEXTAUTH_URL || 'https://kanatachessclub.vercel.app';
+  const description = tournament.adminComment 
+    ? `${tournament.name} - ${tournament.type === 'single' ? 'Single' : 'Double'} Elimination Tournament. ${tournament.adminComment.substring(0, 100)}...`
+    : `${tournament.name} - ${tournament.type === 'single' ? 'Single' : 'Double'} Elimination Tournament with ${tournament.participants.length} participants.`;
+
+  return {
+    title: tournament.name,
+    description,
+    openGraph: {
+      title: `${tournament.name} | Kanata Chess Club`,
+      description,
+      type: 'website',
+      url: `${siteUrl}/tournaments/${params.id}`,
+    },
+    twitter: {
+      card: 'summary',
+      title: tournament.name,
+      description,
+    },
+  };
+}
+
 export default async function TournamentDetailPage({ params }) {
   const session = await getServerSession(authOptions);
   
@@ -33,14 +67,14 @@ export default async function TournamentDetailPage({ params }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <div className="flex justify-between items-start mb-2">
-          <h1 className="text-3xl font-bold text-whisky-900">{tournament.name}</h1>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-whisky-900 break-words">{tournament.name}</h1>
           {session.user.role === 'admin' && (
-            <div className="flex space-x-2">
+            <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
               {tournament.status === 'upcoming' && (
                 <Link
                   href={`/admin/tournaments/${tournament._id}/edit`}
-                  className="px-4 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium"
+                  className="px-4 py-2 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium text-center sm:text-left whitespace-nowrap"
                 >
                   Edit Tournament
                 </Link>
@@ -50,16 +84,19 @@ export default async function TournamentDetailPage({ params }) {
           )}
         </div>
         <div className="space-y-2 mb-4">
-          <p className="text-whisky-700">
-            Type: {tournament.type === 'single' ? 'Single Elimination' : 'Double Elimination'} | 
-            Status: <span className={`font-medium ${
-              tournament.status === 'completed' ? 'text-amber' :
-              tournament.status === 'in-progress' ? 'text-whisky-700' :
-              'text-whisky-600'
-            }`}>
-              {tournament.status.charAt(0).toUpperCase() + tournament.status.slice(1).replace('-', ' ')}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-whisky-700">
+            <span>Type: {tournament.type === 'single' ? 'Single Elimination' : 'Double Elimination'}</span>
+            <span className="hidden sm:inline">|</span>
+            <span>
+              Status: <span className={`font-medium ${
+                tournament.status === 'completed' ? 'text-amber' :
+                tournament.status === 'in-progress' ? 'text-whisky-700' :
+                'text-whisky-600'
+              }`}>
+                {tournament.status.charAt(0).toUpperCase() + tournament.status.slice(1).replace('-', ' ')}
+              </span>
             </span>
-          </p>
+          </div>
           {tournament.eventDate && (
             <p className="text-whisky-700">
               Event Date: {formatDate(new Date(tournament.eventDate))} at{' '}

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../lib/auth';
 import connectDB from '../../../../lib/mongodb';
 import Tournament from '../../../../models/Tournament';
+import { createNotificationsForUsers } from '../../../../lib/notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +79,21 @@ export async function PUT(request) {
     }
 
     await tournament.save();
+
+    // Notify participants if admin comment was added/updated
+    if (adminComment && tournament.participants && tournament.participants.length > 0) {
+      const participantIds = tournament.participants.map(p => 
+        typeof p === 'object' ? p._id.toString() : p.toString()
+      );
+      
+      await createNotificationsForUsers(participantIds, {
+        type: 'admin_comment',
+        title: 'Tournament Update',
+        message: `"${tournament.name}" has been updated. Check the admin note for details.`,
+        link: `/tournaments/${tournament._id}`,
+        tournament: tournament._id,
+      });
+    }
 
     return NextResponse.json({ 
       message: 'Tournament updated successfully',
