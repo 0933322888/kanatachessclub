@@ -4,6 +4,8 @@ import { authOptions } from '../../../../lib/auth';
 import connectDB from '../../../../lib/mongodb';
 import Tournament from '../../../../models/Tournament';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);

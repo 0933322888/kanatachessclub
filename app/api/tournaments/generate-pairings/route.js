@@ -6,6 +6,8 @@ import Tournament from '../../../../models/Tournament';
 import User from '../../../../models/User';
 import { generateSingleEliminationBracket, generateDoubleEliminationBracket } from '../../../../lib/tournament';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);

@@ -5,6 +5,8 @@ import connectDB from '../../../../lib/mongodb';
 import Tournament from '../../../../models/Tournament';
 import mongoose from 'mongoose';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
