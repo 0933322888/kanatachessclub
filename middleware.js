@@ -2,8 +2,14 @@ import { getToken } from 'next-auth/jwt';
 import { NextResponse } from 'next/server';
 
 export async function middleware(request) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = request.nextUrl;
+  
+  // Get token from JWT
+  // In Next.js middleware, the request object should work directly
+  const token = await getToken({ 
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET
+  });
 
   // Protect admin routes
   if (pathname.startsWith('/admin')) {
@@ -25,6 +31,13 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/profile/:path*', '/next-gathering/:path*', '/tournaments/:path*'],
+  matcher: [
+    '/admin/:path*', 
+    '/profile/:path*', 
+    '/next-gathering',
+    '/next-gathering/:path*', 
+    '/tournaments',
+    '/tournaments/:path*'
+  ],
 };
 
