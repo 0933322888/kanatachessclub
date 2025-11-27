@@ -79,7 +79,7 @@ export const metadata = {
   },
   verification: {
     // Add Google Search Console verification if needed
-    // google: 'your-verification-code',
+    google: 'frCkbdgPCXFILp9jmAsTAzxRbPtduhq_kgy-JKrBf2A',
   },
   alternates: {
     canonical: siteUrl,
@@ -92,7 +92,7 @@ export default async function RootLayout({ children }) {
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Kanata Chess Club',
+    name: 'Kanata Chess Club', 
     description: 'A local community of chess enthusiasts in Kanata, Ontario. Join us for biweekly gatherings, tournaments, and friendly matches.',
     url: siteUrl,
     logo: `${siteUrl}/logo.svg`,
