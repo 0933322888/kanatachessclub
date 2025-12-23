@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 // Get site URL with proper validation and fallback
 const getSiteUrl = () => {
   const envUrl = process.env.NEXTAUTH_URL;
-  
+
   // Validate URL format
   if (envUrl && (envUrl.startsWith('http://') || envUrl.startsWith('https://'))) {
     try {
@@ -21,7 +21,7 @@ const getSiteUrl = () => {
       // Invalid URL format, use fallback
     }
   }
-  
+
   // Default to localhost for development
   return 'http://localhost:3000';
 };
@@ -35,7 +35,7 @@ export const metadata = {
     template: '%s | Kanata Chess Club',
   },
   description: 'A local community of chess enthusiasts in Kanata. Join us for biweekly gatherings, tournaments, and friendly matches. Free to play, all ages and abilities welcome.',
-  keywords: ['chess', 'chess club', 'Kanata', 'Ottawa', 'tournament', 'chess tournament', 'chess community', 'local chess'],
+  keywords: ['chess', 'chess club', 'Kanata', 'Ottawa', 'tournament', 'chess tournament', 'chess community', 'local chess', 'chess lessons', 'free chess', 'chess strategy', 'chess learning', 'kids chess'],
   authors: [{ name: 'Kanata Chess Club' }],
   creator: 'Kanata Chess Club',
   publisher: 'Kanata Chess Club',
@@ -84,6 +84,7 @@ export const metadata = {
   alternates: {
     canonical: siteUrl,
   },
+  manifest: '/site.webmanifest',
 };
 
 export default async function RootLayout({ children }) {
@@ -91,18 +92,35 @@ export default async function RootLayout({ children }) {
 
   const structuredData = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: 'Kanata Chess Club', 
+    '@type': 'SportsClub',
+    name: 'Kanata Chess Club',
     description: 'A local community of chess enthusiasts in Kanata, Ontario. Join us for biweekly gatherings, tournaments, and friendly matches.',
     url: siteUrl,
     logo: `${siteUrl}/logo.svg`,
+    image: `${siteUrl}/logo.svg`,
     sameAs: [],
     address: {
       '@type': 'PostalAddress',
+      streetAddress: '8555 Campeau Dr',
       addressLocality: 'Kanata',
       addressRegion: 'ON',
+      postalCode: 'K2T 0K5',
       addressCountry: 'CA',
     },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: '45.3129',
+      longitude: '-75.9248',
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'https://schema.org/Wednesday',
+        opens: '19:00',
+        closes: '21:00',
+      },
+    ],
+    priceRange: 'Free',
   };
 
   return (
@@ -110,7 +128,7 @@ export default async function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo.svg" />
-        
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

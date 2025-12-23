@@ -21,14 +21,14 @@ export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const nextGathering = getNextGatheringDate();
   const upcomingGatherings = getAllUpcomingGatherings(5);
-  
+
   // Get attendee count and tournaments
   let attendeeCount = 0;
   let upcomingTournaments = [];
   try {
     await connectDB();
     attendeeCount = await User.countDocuments({ attendingNextGathering: true });
-    
+
     // Fetch upcoming tournaments (status: upcoming, eventDate in the future)
     const now = new Date();
     upcomingTournaments = await Tournament.find({
@@ -41,11 +41,11 @@ export default async function HomePage() {
   } catch (error) {
     console.error('Error fetching data:', error);
   }
-  
+
   // Gathering details
   const gatheringTime = process.env.GATHERING_TIME || '7pm - 9pm';
   const gatheringLocation = process.env.GATHERING_LOCATION || 'Tanger Outlets Food Court';
-  
+
   // Check if user is registered for each tournament
   const userId = session?.user?.id;
   const tournamentsWithRegistration = upcomingTournaments.map(tournament => {
@@ -68,10 +68,10 @@ export default async function HomePage() {
       <div className="text-center mb-12">
         <div className="flex justify-center mb-6">
           <div className="relative">
-            <Image 
-              src="/logo.svg" 
-              alt="Kanata Chess Club Logo" 
-              width={128} 
+            <Image
+              src="/logo.svg"
+              alt="Kanata Chess Club Logo"
+              width={128}
               height={128}
               className="rounded-full border-4 border-amber shadow-xl"
             />
@@ -85,15 +85,15 @@ export default async function HomePage() {
         </p>
         <div className="bg-gradient-to-br from-whisky-100 to-whisky-50 rounded-lg border-2 border-whisky-300 p-6 max-w-3xl mx-auto">
           <ul className="space-y-3">
-            <li className="flex items-center space-x-3">
+            <li className="flex items-center space-x-3 text-align-left">
               <span className="text-2xl">✓</span>
               <span className="text-whisky-800 font-medium">It is free to play.</span>
             </li>
-            <li className="flex items-center space-x-3">
+            <li className="flex items-center space-x-3 text-align-left">
               <span className="text-2xl">✓</span>
               <span className="text-whisky-800 font-medium">Players of all ages and abilities are welcome.</span>
             </li>
-            <li className="flex items-center space-x-3">
+            <li className="flex items-center space-x-3 text-align-left">
               <span className="text-2xl">✓</span>
               <span className="text-whisky-800 font-medium">Chess sets are provided by the club.</span>
             </li>
@@ -113,7 +113,7 @@ export default async function HomePage() {
               Next Gathering
             </h2>
           </div>
-          
+
           <div className="space-y-4 mb-6">
             <div className="flex items-start space-x-3">
               <div className="w-8 h-8 rounded-full bg-whisky-200 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -125,10 +125,10 @@ export default async function HomePage() {
                 <p className="text-lg text-whisky-800 font-medium">
                   {formatDate(nextGathering)}
                 </p>
-                <p className="text-sm text-whisky-600">Every second Wednesday</p>
+                <p className="text-sm text-whisky-600">Every other Wednesday</p>
               </div>
             </div>
-            
+
             <div className="flex items-start space-x-3">
               <div className="w-8 h-8 rounded-full bg-whisky-200 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-5 h-5 text-whisky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,7 +139,7 @@ export default async function HomePage() {
                 <p className="text-whisky-800 font-medium">{gatheringTime}</p>
               </div>
             </div>
-            
+
             <div className="flex items-start space-x-3">
               <div className="w-8 h-8 rounded-full bg-whisky-200 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-5 h-5 text-whisky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,7 +151,7 @@ export default async function HomePage() {
                 <p className="text-whisky-800 font-medium">{gatheringLocation}</p>
               </div>
             </div>
-            
+
             {attendeeCount > 0 && (
               <div className="flex items-start space-x-3">
                 <div className="w-8 h-8 rounded-full bg-whisky-200 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -167,7 +167,7 @@ export default async function HomePage() {
               </div>
             )}
           </div>
-          
+
           {session ? (
             <Link
               href="/next-gathering"
@@ -180,7 +180,7 @@ export default async function HomePage() {
               href="/auth/register"
               className="inline-block w-full text-center px-6 py-3 bg-amber text-white rounded-md hover:bg-amber-dark shadow-md transition-colors font-medium"
             >
-              Register
+              Register For Free
             </Link>
           )}
         </div>
