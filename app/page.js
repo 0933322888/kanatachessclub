@@ -85,16 +85,16 @@ export default async function HomePage() {
         </p>
         <div className="bg-gradient-to-br from-whisky-100 to-whisky-50 rounded-lg border-2 border-whisky-300 p-6 max-w-3xl mx-auto">
           <ul className="space-y-3">
-            <li className="flex items-center space-x-3 text-align-left">
-              <span className="text-2xl">✓</span>
+            <li className="flex items-start space-x-3 text-left">
+              <span className="text-2xl mt-[-2px]">✓</span>
               <span className="text-whisky-800 font-medium">It is free to play.</span>
             </li>
-            <li className="flex items-center space-x-3 text-align-left">
-              <span className="text-2xl">✓</span>
+            <li className="flex items-start space-x-3 text-left">
+              <span className="text-2xl mt-[-2px]">✓</span>
               <span className="text-whisky-800 font-medium">Players of all ages and abilities are welcome.</span>
             </li>
-            <li className="flex items-center space-x-3 text-align-left">
-              <span className="text-2xl">✓</span>
+            <li className="flex items-start space-x-3 text-left">
+              <span className="text-2xl mt-[-2px]">✓</span>
               <span className="text-whisky-800 font-medium">Chess sets are provided by the club.</span>
             </li>
           </ul>
