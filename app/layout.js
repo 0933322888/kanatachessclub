@@ -3,6 +3,7 @@ import { Inter, Cormorant_Garamond } from 'next/font/google';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../lib/auth';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import Providers from '../components/Providers';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -145,6 +146,7 @@ export default async function RootLayout({ children }) {
           <main className="min-h-screen bg-whisky-50">
             {children}
           </main>
+          <Footer />
         </Providers>
       </body>
     </html>
