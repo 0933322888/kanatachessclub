@@ -30,6 +30,10 @@ module.exports = {
           DEFAULT: '#722F37',
           dark: '#5C1A1F',
         },
+        fontFamily: {
+          sans: ['var(--font-inter)', 'sans-serif'],
+          serif: ['var(--font-cormorant)', 'serif'],
+        },
       },
     },
   },

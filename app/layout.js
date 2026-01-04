@@ -1,11 +1,16 @@
 import './globals.css';
-import { Inter } from 'next/font/google';
+import { Inter, Cormorant_Garamond } from 'next/font/google';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../lib/auth';
 import Navbar from '../components/Navbar';
 import Providers from '../components/Providers';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cormorant'
+});
 
 // Get site URL with proper validation and fallback
 const getSiteUrl = () => {
@@ -134,7 +139,7 @@ export default async function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${cormorant.variable} font-sans`}>
         <Providers session={session}>
           <Navbar session={session} />
           <main className="min-h-screen bg-whisky-50">
