@@ -81,7 +81,7 @@ export default async function HomePage() {
         <div className="relative z-10 px-4 max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
             <Image
-              src="/logo.svg"
+              src="/logo.png"
               alt="Kanata Chess Club Logo"
               width={100}
               height={100}
