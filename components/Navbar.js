@@ -15,10 +15,10 @@ export default function Navbar({ session }) {
         <div className="flex justify-between h-16">
           <div className="flex">
             <Link href="/" className="flex items-center space-x-2 px-2 py-2 text-xl font-bold text-amber hover:text-amber-light transition-colors">
-              <Image 
-                src="/logo.svg" 
-                alt="Kanata Chess Club Logo" 
-                width={32} 
+              <Image
+                src="/logo.png"
+                alt="Kanata Chess Club Logo"
+                width={32}
                 height={32}
                 className="rounded"
               />
