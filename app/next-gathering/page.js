@@ -24,7 +24,7 @@ export default async function NextGatheringPage() {
     redirect('/auth/login');
   }
 
-  const { name, location, address, gatheringTime, coordinates } = getSiteConfig();
+  const { name, location, address, gatheringTime, coordinates, googleMapsUrl } = getSiteConfig();
   const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
 
   await connectDB();
@@ -66,6 +66,7 @@ export default async function NextGatheringPage() {
       gatheringLocation={gatheringLocation}
       gatheringTime={gatheringTime}
       gatheringCoordinates={coordinates}
+      googleMapsUrl={googleMapsUrl}
       isAttending={currentUser?.attendingNextGathering || false}
       attendees={JSON.parse(JSON.stringify(attendees))}
       myRequests={JSON.parse(JSON.stringify(myRequests))}

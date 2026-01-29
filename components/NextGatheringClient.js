@@ -11,7 +11,7 @@ const LocationMap = dynamic(() => import('./LocationMap'), {
   ssr: false,
 });
 
-export default function NextGatheringClient({ nextGathering, gatheringLocation, gatheringTime, gatheringCoordinates, isAttending, attendees: initialAttendees, myRequests, matchedPairs, currentUserId, currentUser }) {
+export default function NextGatheringClient({ nextGathering, gatheringLocation, gatheringTime, gatheringCoordinates, googleMapsUrl, isAttending, attendees: initialAttendees, myRequests, matchedPairs, currentUserId, currentUser }) {
   const router = useRouter();
   const [loading, setLoading] = useState({});
   const [message, setMessage] = useState('');
@@ -30,12 +30,12 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
   const [attendees, setAttendees] = useState(() => {
     // Initialize with server data, and ensure current user is included if they're attending
     const attendeesList = Array.isArray(initialAttendees) ? initialAttendees : [];
-    
+
     // Debug logging
     console.log('Initial attendees from server:', attendeesList.length);
     console.log('Current user attending status:', isAttending);
     console.log('Current user data:', currentUser);
-    
+
     if (isAttending && currentUser && currentUser._id) {
       const userInList = attendeesList.some(a => a && a._id && a._id.toString() === currentUserId);
       if (!userInList) {
@@ -88,7 +88,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
     const isPaired = pairings[attendeeId];
     const hasPendingRequest = myRequests.some(
       r => (r.requester._id.toString() === currentUserId && r.requested._id.toString() === attendeeId) ||
-           (r.requested._id.toString() === currentUserId && r.requester._id.toString() === attendeeId)
+        (r.requested._id.toString() === currentUserId && r.requester._id.toString() === attendeeId)
     );
     const hasAcceptedRequest = myRequests.some(
       r => r.status === 'accepted' && (
@@ -136,11 +136,10 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
           <button
             onClick={() => handlePairWith(attendeeId)}
             disabled={loading[`pair-${attendeeId}`] || hasPendingRequest}
-            className={`px-4 py-2 rounded-md shadow-md font-medium transition-colors ${
-              hasPendingRequest
-                ? 'bg-whisky-200 text-whisky-700 cursor-not-allowed'
-                : 'bg-amber text-white hover:bg-amber-dark'
-            } disabled:opacity-50`}
+            className={`px-4 py-2 rounded-md shadow-md font-medium transition-colors ${hasPendingRequest
+              ? 'bg-whisky-200 text-whisky-700 cursor-not-allowed'
+              : 'bg-amber text-white hover:bg-amber-dark'
+              } disabled:opacity-50`}
           >
             {loading[`pair-${attendeeId}`] ? 'Pairing...' : hasPendingRequest ? 'Request Sent' : 'Pair with'}
           </button>
@@ -329,7 +328,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
   );
   const myAcceptedRequests = myRequests.filter(
     r => r.status === 'accepted' && (
-      r.requester._id.toString() === currentUserId || 
+      r.requester._id.toString() === currentUserId ||
       r.requested._id.toString() === currentUserId
     )
   );
@@ -339,11 +338,10 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
       <h1 className="text-3xl font-bold text-whisky-900 mb-8">Next Gathering</h1>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-lg shadow-md border-2 ${
-          message.includes('success') || message.includes('matched') || message.includes('attending')
-            ? 'bg-whisky-100 text-whisky-800 border-amber'
-            : 'bg-burgundy-light text-white border-burgundy'
-        }`}>
+        <div className={`mb-4 p-4 rounded-lg shadow-md border-2 ${message.includes('success') || message.includes('matched') || message.includes('attending')
+          ? 'bg-whisky-100 text-whisky-800 border-amber'
+          : 'bg-burgundy-light text-white border-burgundy'
+          }`}>
           {message}
         </div>
       )}
@@ -367,6 +365,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
                     latitude={gatheringCoordinates.latitude}
                     longitude={gatheringCoordinates.longitude}
                     locationName={gatheringLocation}
+                    googleMapsUrl={googleMapsUrl}
                   />
                 </div>
               )}
@@ -375,11 +374,10 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
           <button
             onClick={handleToggleAttendance}
             disabled={loading.attendance}
-            className={`w-full sm:w-auto px-6 py-2 rounded-md shadow-md font-medium transition-colors whitespace-nowrap ${
-              attending
-                ? 'bg-amber text-white hover:bg-amber-dark'
-                : 'bg-whisky-200 text-whisky-800 hover:bg-whisky-300 border-2 border-whisky-300'
-            } disabled:opacity-50`}
+            className={`w-full sm:w-auto px-6 py-2 rounded-md shadow-md font-medium transition-colors whitespace-nowrap ${attending
+              ? 'bg-amber text-white hover:bg-amber-dark'
+              : 'bg-whisky-200 text-whisky-800 hover:bg-whisky-300 border-2 border-whisky-300'
+              } disabled:opacity-50`}
           >
             {loading.attendance ? 'Updating...' : attending ? '✓ Attending' : 'Mark as Attending'}
           </button>
@@ -447,7 +445,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
       {myAcceptedRequests.length > 0 && (
         <div className="bg-whisky-100 border-2 border-amber rounded-lg p-6 mb-6">
           <h2 className="text-xl font-semibold text-whisky-900 mb-4">Your Match</h2>
-            {myAcceptedRequests.map((request) => {
+          {myAcceptedRequests.map((request) => {
             const opponent = request.requester._id.toString() === currentUserId
               ? request.requested
               : request.requester;
