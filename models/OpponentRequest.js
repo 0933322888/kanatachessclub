@@ -20,13 +20,19 @@ const opponentRequestSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  clubId: {
+    type: String,
+    required: true,
+    index: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
 
-opponentRequestSchema.index({ requester: 1, requested: 1, gatheringDate: 1 }, { unique: true });
+opponentRequestSchema.index({ requester: 1, requested: 1, gatheringDate: 1, clubId: 1 }, { unique: true });
+
 
 const OpponentRequest = mongoose.models.OpponentRequest || mongoose.model('OpponentRequest', opponentRequestSchema);
 

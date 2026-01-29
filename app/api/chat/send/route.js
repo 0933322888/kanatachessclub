@@ -32,11 +32,15 @@ export async function POST(request) {
 
     await connectDB();
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     const message = new Message({
       gatheringDate: new Date(gatheringDate),
       user: session.user.id,
       content: content.trim(),
+      clubId: currentClubId,
     });
+
 
     await message.save();
     await message.populate('user', 'firstName lastName chessComData.avatar');

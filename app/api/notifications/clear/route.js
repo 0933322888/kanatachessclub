@@ -13,9 +13,14 @@ export async function DELETE(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     await connectDB();
 
-    await Notification.deleteMany({ user: session.user.id });
+    await Notification.deleteMany({
+      user: session.user.id,
+      clubId: currentClubId,
+    });
 
     return NextResponse.json({ message: 'All notifications cleared' });
   } catch (error) {

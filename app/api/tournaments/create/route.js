@@ -38,6 +38,8 @@ export async function POST(request) {
 
     await connectDB();
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     // Create tournament without matches - pairing will be done manually or via pairing button
     const tournament = new Tournament({
       name,
@@ -49,11 +51,13 @@ export async function POST(request) {
       eventDate: eventDateObj,
       gameTimeDuration: gameTimeDuration || '',
       adminComment: adminComment || '',
+      clubId: currentClubId,
     });
+
 
     await tournament.save();
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Tournament created successfully',
       tournamentId: tournament._id.toString(),
     });

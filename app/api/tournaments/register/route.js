@@ -26,13 +26,16 @@ export async function POST(request) {
 
     await connectDB();
 
-    const tournament = await Tournament.findById(tournamentId);
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
+    const tournament = await Tournament.findOne({ _id: tournamentId, clubId: currentClubId });
     if (!tournament) {
       return NextResponse.json(
-        { error: 'Tournament not found' },
+        { error: 'Tournament not found for this club' },
         { status: 404 }
       );
     }
+
 
     // Check if tournament is still open for registration
     if (tournament.status !== 'upcoming') {
@@ -44,10 +47,10 @@ export async function POST(request) {
 
     // Check if user is already registered
     const userId = new mongoose.Types.ObjectId(session.user.id);
-    const isRegistered = tournament.participants.some(p => 
+    const isRegistered = tournament.participants.some(p =>
       p.toString() === userId.toString()
     );
-    
+
     if (isRegistered) {
       return NextResponse.json(
         { error: 'You are already registered for this tournament' },
@@ -59,7 +62,7 @@ export async function POST(request) {
     tournament.participants.push(userId);
     await tournament.save();
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Successfully registered for tournament',
       tournament: {
         id: tournament._id.toString(),

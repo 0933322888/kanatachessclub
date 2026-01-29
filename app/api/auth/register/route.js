@@ -28,6 +28,8 @@ export async function POST(request) {
 
     const hashedPassword = await User.hashPassword(password);
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     const user = new User({
       firstName,
       lastName,
@@ -35,7 +37,9 @@ export async function POST(request) {
       password: hashedPassword,
       chessComUsername: chessComUsername || null,
       preferredStrength: preferredStrength || 'Beginner',
+      clubs: [currentClubId],
     });
+
 
     await user.save();
 

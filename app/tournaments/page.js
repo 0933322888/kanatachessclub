@@ -4,25 +4,30 @@ import { authOptions } from '../../lib/auth';
 import connectDB from '../../lib/mongodb';
 import Tournament from '../../models/Tournament';
 import Link from 'next/link';
+import { getSiteConfig } from '../../lib/site-config';
+
 
 export const metadata = {
   title: 'Tournaments',
-  description: 'View all chess tournaments organized by Kanata Chess Club. Register for upcoming tournaments, view brackets, and track results.',
+  description: `View all chess tournaments organized by ${getSiteConfig().name}. Register for upcoming tournaments, view brackets, and track results.`,
   openGraph: {
-    title: 'Tournaments | Kanata Chess Club',
-    description: 'View all chess tournaments organized by Kanata Chess Club. Register for upcoming tournaments, view brackets, and track results.',
+    title: `Tournaments | ${getSiteConfig().name}`,
+    description: `View all chess tournaments organized by ${getSiteConfig().name}. Register for upcoming tournaments, view brackets, and track results.`,
   },
 };
 
 export default async function TournamentsPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect('/auth/login');
   }
 
+  const { clubId } = { clubId: process.env.NEXT_PUBLIC_CLUB_ID || 'kanata' };
+
   await connectDB();
-  const tournaments = await Tournament.find()
+  const tournaments = await Tournament.find({ clubId })
+
     .populate('participants', 'firstName lastName')
     .populate('winner', 'firstName lastName')
     .populate('createdBy', 'firstName lastName')
@@ -75,11 +80,10 @@ export default async function TournamentsPage() {
                 Type: {tournament.type === 'single' ? 'Single Elimination' : 'Double Elimination'}
               </p>
               <p className="text-sm text-whisky-700 mb-2">
-                Status: <span className={`font-medium ${
-                  tournament.status === 'completed' ? 'text-amber' :
+                Status: <span className={`font-medium ${tournament.status === 'completed' ? 'text-amber' :
                   tournament.status === 'in-progress' ? 'text-whisky-800' :
-                  'text-whisky-600'
-                }`}>
+                    'text-whisky-600'
+                  }`}>
                   {tournament.status.charAt(0).toUpperCase() + tournament.status.slice(1).replace('-', ' ')}
                 </span>
               </p>

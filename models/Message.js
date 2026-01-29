@@ -22,7 +22,13 @@ const messageSchema = new mongoose.Schema({
     default: Date.now,
     index: true,
   },
+  clubId: {
+    type: String,
+    required: true,
+    index: true,
+  },
 });
+
 
 const Message = mongoose.models.Message || mongoose.model('Message', messageSchema);
 

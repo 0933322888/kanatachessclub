@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: function() {
+    required: function () {
       // Password is required only for credentials provider
       return !this.provider || this.provider === 'credentials';
     },
@@ -36,6 +36,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  clubs: [{
+    type: String,
+    index: true,
+  }],
+
   chessComUsername: {
     type: String,
     default: null,

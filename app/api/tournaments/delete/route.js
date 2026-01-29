@@ -29,18 +29,21 @@ export async function DELETE(request) {
 
     await connectDB();
 
-    const tournament = await Tournament.findById(tournamentId);
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
+    const tournament = await Tournament.findOne({ _id: tournamentId, clubId: currentClubId });
     if (!tournament) {
       return NextResponse.json(
-        { error: 'Tournament not found' },
+        { error: 'Tournament not found for this club' },
         { status: 404 }
       );
     }
 
+
     // Delete the tournament
     await Tournament.findByIdAndDelete(tournamentId);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Tournament deleted successfully',
     });
   } catch (error) {

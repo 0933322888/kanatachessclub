@@ -13,12 +13,15 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     await connectDB();
 
     await Notification.updateMany(
-      { user: session.user.id, read: false },
+      { user: session.user.id, read: false, clubId: currentClubId },
       { read: true }
     );
+
 
     return NextResponse.json({ message: 'All notifications marked as read' });
   } catch (error) {

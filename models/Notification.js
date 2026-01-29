@@ -46,7 +46,13 @@ const notificationSchema = new mongoose.Schema({
     default: Date.now,
     index: true,
   },
+  clubId: {
+    type: String,
+    required: true,
+    index: true,
+  },
 });
+
 
 // Compound index for efficient queries
 notificationSchema.index({ user: 1, read: 1, createdAt: -1 });

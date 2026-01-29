@@ -23,11 +23,15 @@ export async function GET(request) {
       );
     }
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     await connectDB();
 
     const messages = await Message.find({
       gatheringDate: new Date(gatheringDate),
+      clubId: currentClubId,
     })
+
       .populate('user', 'firstName lastName chessComData.avatar')
       .sort({ createdAt: 1 })
       .lean();

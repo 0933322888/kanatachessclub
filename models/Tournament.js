@@ -100,7 +100,13 @@ const tournamentSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  clubId: {
+    type: String,
+    required: true,
+    index: true,
+  },
 });
+
 
 const Tournament = mongoose.models.Tournament || mongoose.model('Tournament', tournamentSchema);
 

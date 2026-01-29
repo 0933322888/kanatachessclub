@@ -19,7 +19,9 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get('limit')) || 20;
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
 
-    const query = { user: session.user.id };
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
+    const query = { user: session.user.id, clubId: currentClubId };
     if (unreadOnly) {
       query.read = false;
     }
@@ -32,7 +34,9 @@ export async function GET(request) {
     const unreadCount = await Notification.countDocuments({
       user: session.user.id,
       read: false,
+      clubId: currentClubId,
     });
+
 
     return NextResponse.json({
       notifications,

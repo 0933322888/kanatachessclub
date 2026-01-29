@@ -27,13 +27,17 @@ export async function POST(request) {
       );
     }
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     await connectDB();
 
     const result = await OpponentRequest.deleteMany({
       gatheringDate: new Date(gatheringDate),
+      clubId: currentClubId,
     });
 
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       message: 'Gathering matches reset successfully',
       deletedCount: result.deletedCount,
     });

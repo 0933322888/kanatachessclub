@@ -23,12 +23,16 @@ export async function POST(request) {
       );
     }
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     await connectDB();
 
     const notification = await Notification.findOne({
       _id: notificationId,
       user: session.user.id,
+      clubId: currentClubId,
     });
+
 
     if (!notification) {
       return NextResponse.json(

@@ -23,9 +23,15 @@ export async function POST(request) {
       );
     }
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     await connectDB();
 
-    const opponentRequest = await OpponentRequest.findById(requestId);
+    const opponentRequest = await OpponentRequest.findOne({
+      _id: requestId,
+      clubId: currentClubId,
+    });
+
 
     if (!opponentRequest) {
       return NextResponse.json(

@@ -25,11 +25,14 @@ export async function POST(request) {
 
     await connectDB();
 
+    const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
     // Check if request already exists
     const existing = await OpponentRequest.findOne({
       requester: session.user.id,
       requested: requestedId,
       gatheringDate: new Date(gatheringDate),
+      clubId: currentClubId,
     });
 
     if (existing) {
@@ -44,7 +47,9 @@ export async function POST(request) {
       requested: requestedId,
       gatheringDate: new Date(gatheringDate),
       status: 'pending',
+      clubId: currentClubId,
     });
+
 
     await opponentRequest.save();
 
