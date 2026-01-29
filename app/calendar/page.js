@@ -1,4 +1,5 @@
-import { getAllUpcomingGatherings, formatDate } from '../../lib/utils';
+import { formatDate } from '../../lib/utils';
+import { getUpcomingGatherings } from '../../lib/gatherings';
 import Tournament from '../../models/Tournament';
 import connectDB from '../../lib/mongodb';
 import Link from 'next/link';
@@ -9,7 +10,8 @@ export const metadata = {
 };
 
 export default async function CalendarPage() {
-    const gatherings = getAllUpcomingGatherings(20);
+    const gatheringsData = await getUpcomingGatherings(20);
+    const gatherings = gatheringsData.map(g => g.date);
     let tournaments = [];
 
     try {

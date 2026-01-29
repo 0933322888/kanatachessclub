@@ -4,69 +4,68 @@ import { authOptions } from '../../lib/auth';
 import connectDB from '../../lib/mongodb';
 import User from '../../models/User';
 import OpponentRequest from '../../models/OpponentRequest';
-import { getNextGatheringDate, formatDate } from '../../lib/utils';
+import { formatDate } from '../../lib/utils';
+import { getNextGatheringDate } from '../../lib/gatherings';
 import NextGatheringClient from '../../components/NextGatheringClient';
+import { getSiteConfig } from '../../lib/site-config';
+
+export async function generateMetadata() {
+  const { name } = getSiteConfig();
+  return {
+    title: `Next Gathering | ${name}`,
+    description: `Join us for the next gathering of ${name}. Check attendees, request opponents, and see location details.`,
+  };
+}
 
 export default async function NextGatheringPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect('/auth/login');
   }
 
+  const { name, location, address, gatheringTime, coordinates } = getSiteConfig();
+  const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
   await connectDB();
-  const nextGathering = getNextGatheringDate();
+  const nextGathering = await getNextGatheringDate();
 
   // Get current user's full data for attendees list
   const currentUser = await User.findById(session.user.id).select('firstName lastName chessComData manualRating preferredStrength attendingNextGathering');
 
-  // Get all users attending (including current user if they marked attendance)
+  // Get all users attending who are members of this club
   const attendees = await User.find({
     attendingNextGathering: true,
+    clubs: currentClubId,
   })
     .select('_id firstName lastName chessComData manualRating preferredStrength')
     .sort({ lastName: 1, firstName: 1 })
     .lean();
-  
-  // Debug: log attendees count
-  console.log(`Found ${attendees.length} attendees for next gathering`);
-  if (attendees.length > 0) {
-    console.log('Attendees:', attendees.map(a => `${a.firstName} ${a.lastName} (${a._id})`));
-  }
 
-
-  // Get opponent requests for current user
+  // Get opponent requests for current user at this club
   const myRequests = await OpponentRequest.find({
+    clubId: currentClubId,
     $or: [
       { requester: session.user.id, gatheringDate: nextGathering },
       { requested: session.user.id, gatheringDate: nextGathering },
     ],
   }).populate('requester', 'firstName lastName').populate('requested', 'firstName lastName');
 
-  // Get matched pairs
+  // Get matched pairs at this club
   const matchedPairs = await OpponentRequest.find({
+    clubId: currentClubId,
     gatheringDate: nextGathering,
     status: 'accepted',
   }).populate('requester', 'firstName lastName').populate('requested', 'firstName lastName');
 
-  // Gathering location (can be made configurable later)
-  const gatheringLocation = process.env.GATHERING_LOCATION || 'Kanata Community Centre, 100 John Anson Lane, Kanata, ON';
-  
-  // Gathering time
-  const gatheringTime = process.env.GATHERING_TIME || '7pm - 9pm';
-  
-  // Gathering coordinates
-  const gatheringCoordinates = {
-    latitude: parseFloat(process.env.GATHERING_LATITUDE || '45.29691918721957'),
-    longitude: parseFloat(process.env.GATHERING_LONGITUDE || '-75.9389548581184'),
-  };
+  const gatheringLocation = `${location} (${address})`;
 
   return (
     <NextGatheringClient
       nextGathering={nextGathering.toISOString()}
       gatheringLocation={gatheringLocation}
       gatheringTime={gatheringTime}
-      gatheringCoordinates={gatheringCoordinates}
+      gatheringCoordinates={coordinates}
       isAttending={currentUser?.attendingNextGathering || false}
       attendees={JSON.parse(JSON.stringify(attendees))}
       myRequests={JSON.parse(JSON.stringify(myRequests))}
@@ -76,4 +75,5 @@ export default async function NextGatheringPage() {
     />
   );
 }
+
 

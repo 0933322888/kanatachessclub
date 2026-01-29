@@ -2,7 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../lib/auth';
-import { getNextGatheringDate, getAllUpcomingGatherings, formatDate } from '../lib/utils';
+import { formatDate } from '../lib/utils';
+import { getNextGatheringDate, getUpcomingGatherings } from '../lib/gatherings';
 import { getSiteConfig } from '../lib/site-config';
 import connectDB from '../lib/mongodb';
 import User from '../models/User';
@@ -20,9 +21,10 @@ export const metadata = {
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
-  const nextGathering = getNextGatheringDate();
-  const upcomingGatherings = getAllUpcomingGatherings(5);
-  const { name, description, gatheringTime: defaultTime, location: defaultLocation, assets } = getSiteConfig();
+  const nextGathering = await getNextGatheringDate();
+  const upcomingGatheringsData = await getUpcomingGatherings(5);
+  const upcomingGatherings = upcomingGatheringsData.map(g => g.date);
+  const { name, description, gatheringTime: defaultTime, location: defaultLocation, address, assets } = getSiteConfig();
 
   // Get attendee count and tournaments
   let attendeeCount = 0;
@@ -165,7 +167,7 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <p className="font-semibold text-whisky-900">{gatheringLocation}</p>
-                    <p className="text-sm text-whisky-600">Usually near the food court entrance</p>
+                    <p className="text-sm text-whisky-600">{address}</p>
                   </div>
                 </div>
 

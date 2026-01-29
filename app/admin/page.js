@@ -4,12 +4,13 @@ import { authOptions } from '../../lib/auth';
 import connectDB from '../../lib/mongodb';
 import User from '../../models/User';
 import Tournament from '../../models/Tournament';
-import OpponentRequest from '../../models/OpponentRequest';
+import Gathering from '../../models/Gathering';
 import AdminClient from '../../components/AdminClient';
+import { getDefaultGatheringSlots } from '../../lib/gatherings';
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect('/auth/login');
   }
@@ -18,12 +19,23 @@ export default async function AdminPage() {
     redirect('/');
   }
 
+  const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
+
   await connectDB();
 
   const users = await User.find().select('-password').sort({ createdAt: -1 });
   const tournaments = await Tournament.find().populate('participants').sort({ createdAt: -1 });
   const totalUsers = await User.countDocuments();
   const activeUsers = await User.countDocuments({ attendingNextGathering: true });
+
+  // Get raw gathering slots (default schedule)
+  const gatheringSlots = getDefaultGatheringSlots(10);
+
+  // Get all existing overrides for these slots
+  const gatheringOverrides = await Gathering.find({
+    clubId: currentClubId,
+    originalDate: { $in: gatheringSlots }
+  });
 
   return (
     <AdminClient
@@ -34,6 +46,9 @@ export default async function AdminPage() {
         activeUsers,
         totalTournaments: tournaments.length,
       }}
+      gatheringSlots={JSON.parse(JSON.stringify(gatheringSlots))}
+      gatheringOverrides={JSON.parse(JSON.stringify(gatheringOverrides))}
+      clubId={currentClubId}
     />
   );
 }

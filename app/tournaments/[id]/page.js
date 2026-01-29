@@ -5,12 +5,14 @@ import connectDB from '../../../lib/mongodb';
 import Tournament from '../../../models/Tournament';
 import TournamentBracket from '../../../components/TournamentBracket';
 import TournamentPairing from '../../../components/TournamentPairing';
-import DeleteTournamentButton from '../../../components/DeleteTournamentButton';
 import { formatDate } from '../../../lib/utils';
 import { serializeTournament } from '../../../lib/serialize';
 import Link from 'next/link';
+import { getSiteConfig } from '../../../lib/site-config';
+
 
 export async function generateMetadata({ params }) {
+  const { name } = getSiteConfig();
   await connectDB();
   const tournament = await Tournament.findById(params.id)
     .populate('participants', 'firstName lastName')
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }) {
   }
 
   const siteUrl = process.env.NEXTAUTH_URL || 'https://kanatachessclub.vercel.app';
-  const description = tournament.adminComment 
+  const description = tournament.adminComment
     ? `${tournament.name} - ${tournament.type === 'single' ? 'Single' : 'Double'} Elimination Tournament. ${tournament.adminComment.substring(0, 100)}...`
     : `${tournament.name} - ${tournament.type === 'single' ? 'Single' : 'Double'} Elimination Tournament with ${tournament.participants.length} participants.`;
 
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }) {
     title: tournament.name,
     description,
     openGraph: {
-      title: `${tournament.name} | Kanata Chess Club`,
+      title: `${tournament.name} | ${name}`,
       description,
       type: 'website',
       url: `${siteUrl}/tournaments/${params.id}`,
@@ -46,13 +48,15 @@ export async function generateMetadata({ params }) {
 
 export default async function TournamentDetailPage({ params }) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect('/auth/login');
   }
 
+  const { clubId: currentClubId } = { clubId: process.env.NEXT_PUBLIC_CLUB_ID || 'kanata' };
+
   await connectDB();
-  const tournament = await Tournament.findById(params.id)
+  const tournament = await Tournament.findOne({ _id: params.id, clubId: currentClubId })
     .populate('participants', 'firstName lastName chessComData manualRating')
     .populate('matches.player1', 'firstName lastName')
     .populate('matches.player2', 'firstName lastName')
@@ -63,6 +67,7 @@ export default async function TournamentDetailPage({ params }) {
   if (!tournament) {
     redirect('/tournaments');
   }
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -88,11 +93,10 @@ export default async function TournamentDetailPage({ params }) {
             <span>Type: {tournament.type === 'single' ? 'Single Elimination' : 'Double Elimination'}</span>
             <span className="hidden sm:inline">|</span>
             <span>
-              Status: <span className={`font-medium ${
-                tournament.status === 'completed' ? 'text-amber' :
+              Status: <span className={`font-medium ${tournament.status === 'completed' ? 'text-amber' :
                 tournament.status === 'in-progress' ? 'text-whisky-700' :
-                'text-whisky-600'
-              }`}>
+                  'text-whisky-600'
+                }`}>
                 {tournament.status.charAt(0).toUpperCase() + tournament.status.slice(1).replace('-', ' ')}
               </span>
             </span>
@@ -130,13 +134,13 @@ export default async function TournamentDetailPage({ params }) {
         )}
       </div>
 
-      <TournamentPairing 
-        tournament={serializeTournament(tournament)} 
+      <TournamentPairing
+        tournament={serializeTournament(tournament)}
         isAdmin={session.user.role === 'admin'}
       />
 
-      <TournamentBracket 
-        tournament={serializeTournament(tournament)} 
+      <TournamentBracket
+        tournament={serializeTournament(tournament)}
         isAdmin={session.user.role === 'admin'}
       />
     </div>

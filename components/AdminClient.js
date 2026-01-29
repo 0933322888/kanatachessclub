@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function AdminClient({ users, tournaments, stats }) {
+export default function AdminClient({ users, tournaments, stats, gatheringSlots, gatheringOverrides, clubId }) {
   const router = useRouter();
   const [loading, setLoading] = useState({});
   const [message, setMessage] = useState('');
@@ -83,6 +83,34 @@ export default function AdminClient({ users, tournaments, stats }) {
     }
   };
 
+  const handleUpdateGathering = async (originalDate, updates) => {
+    setMessage('');
+    try {
+      const response = await fetch('/api/admin/gatherings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          originalDate,
+          clubId,
+          ...updates,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setMessage(data.error || 'Update failed');
+        return;
+      }
+
+      setMessage('Gathering schedule updated');
+      router.refresh();
+    } catch (err) {
+      setMessage('An error occurred');
+    }
+  };
+
   const handleDeleteTournament = async (tournamentId, tournamentName) => {
     if (!confirm(`Are you sure you want to delete "${tournamentName}"? This action cannot be undone.`)) {
       return;
@@ -117,11 +145,10 @@ export default function AdminClient({ users, tournaments, stats }) {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Admin Panel</h1>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-lg shadow-md border-2 ${
-          message.includes('success')
-            ? 'bg-whisky-100 text-whisky-800 border-amber'
-            : 'bg-burgundy-light text-white border-burgundy'
-        }`}>
+        <div className={`mb-4 p-4 rounded-lg shadow-md border-2 ${message.includes('success')
+          ? 'bg-whisky-100 text-whisky-800 border-amber'
+          : 'bg-burgundy-light text-white border-burgundy'
+          }`}>
           {message}
         </div>
       )}
@@ -149,31 +176,28 @@ export default function AdminClient({ users, tournaments, stats }) {
           <nav className="flex -mb-px">
             <button
               onClick={() => setActiveTab('users')}
-              className={`px-6 py-3 text-sm font-medium ${
-                activeTab === 'users'
-                  ? 'border-b-2 border-amber text-amber'
-                  : 'text-whisky-600 hover:text-whisky-900'
-              }`}
+              className={`px-6 py-3 text-sm font-medium ${activeTab === 'users'
+                ? 'border-b-2 border-amber text-amber'
+                : 'text-whisky-600 hover:text-whisky-900'
+                }`}
             >
               Users
             </button>
             <button
               onClick={() => setActiveTab('tournaments')}
-              className={`px-6 py-3 text-sm font-medium ${
-                activeTab === 'tournaments'
-                  ? 'border-b-2 border-amber text-amber'
-                  : 'text-whisky-600 hover:text-whisky-900'
-              }`}
+              className={`px-6 py-3 text-sm font-medium ${activeTab === 'tournaments'
+                ? 'border-b-2 border-amber text-amber'
+                : 'text-whisky-600 hover:text-whisky-900'
+                }`}
             >
               Tournaments
             </button>
             <button
               onClick={() => setActiveTab('gatherings')}
-              className={`px-6 py-3 text-sm font-medium ${
-                activeTab === 'gatherings'
-                  ? 'border-b-2 border-amber text-amber'
-                  : 'text-whisky-600 hover:text-whisky-900'
-              }`}
+              className={`px-6 py-3 text-sm font-medium ${activeTab === 'gatherings'
+                ? 'border-b-2 border-amber text-amber'
+                : 'text-whisky-600 hover:text-whisky-900'
+                }`}
             >
               Gatherings
             </button>
@@ -218,9 +242,8 @@ export default function AdminClient({ users, tournaments, stats }) {
                         <div className="text-sm text-whisky-700">{user.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          user.role === 'admin' ? 'bg-amber text-white' : 'bg-whisky-200 text-whisky-800'
-                        }`}>
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === 'admin' ? 'bg-amber text-white' : 'bg-whisky-200 text-whisky-800'
+                          }`}>
                           {user.role}
                         </span>
                       </td>
@@ -231,9 +254,8 @@ export default function AdminClient({ users, tournaments, stats }) {
                         <button
                           onClick={() => handleToggleRole(user._id, user.role)}
                           disabled={loading[user._id]}
-                          className={`${
-                            user.role === 'admin' ? 'text-burgundy hover:text-burgundy-dark' : 'text-amber hover:text-amber-dark'
-                          } transition-colors`}
+                          className={`${user.role === 'admin' ? 'text-burgundy hover:text-burgundy-dark' : 'text-amber hover:text-amber-dark'
+                            } transition-colors`}
                         >
                           {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
                         </button>
@@ -293,33 +315,141 @@ export default function AdminClient({ users, tournaments, stats }) {
           )}
 
           {activeTab === 'gatherings' && (
-            <div className="space-y-4">
-              <p className="text-whisky-700 mb-4">
-                Reset opponent matches for a specific gathering date.
-              </p>
-              <div className="border-2 border-whisky-300 rounded-lg p-4 bg-white">
-                <label className="block text-sm font-medium text-whisky-800 mb-2">
-                  Gathering Date
-                </label>
-                <input
-                  type="date"
-                  id="gatheringDate"
-                  className="px-3 py-2 border-2 border-whisky-300 rounded-md bg-white text-whisky-900 focus:outline-none focus:ring-2 focus:ring-amber focus:border-amber"
-                />
-                <button
-                  onClick={() => {
-                    const dateInput = document.getElementById('gatheringDate');
-                    if (dateInput.value) {
-                      handleResetGathering(dateInput.value);
-                    } else {
-                      setMessage('Please select a date');
-                    }
-                  }}
-                  disabled={loading.reset}
-                  className="ml-4 px-4 py-2 bg-burgundy text-white rounded-md hover:bg-burgundy-dark shadow-md disabled:opacity-50 transition-colors font-medium"
-                >
-                  Reset Matches
-                </button>
+            <div className="space-y-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-whisky-900">Manage Gathering Schedule</h3>
+                <p className="text-sm text-whisky-600">Default Schedule: Every 2 weeks</p>
+              </div>
+
+              <div className="space-y-4">
+                {gatheringSlots.map((slotDateStr) => {
+                  const slotDate = new Date(slotDateStr);
+                  const override = gatheringOverrides.find(
+                    (o) => new Date(o.originalDate).getTime() === slotDate.getTime()
+                  );
+
+                  const isCancelled = override?.isCancelled;
+                  const displayDate = override?.overriddenDate ? new Date(override.overriddenDate) : slotDate;
+                  const hasOverride = !!override;
+
+                  return (
+                    <div
+                      key={slotDateStr}
+                      className={`border-2 rounded-xl p-6 transition-all shadow-sm hover:shadow-md ${isCancelled
+                        ? 'border-red-200 bg-red-50'
+                        : hasOverride
+                          ? 'border-amber-200 bg-amber-50'
+                          : 'border-whisky-200 bg-white'
+                        }`}
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xl font-bold text-whisky-900">
+                              {new Intl.DateTimeFormat('en-US', {
+                                weekday: 'long',
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric'
+                              }).format(displayDate)}
+                            </span>
+                            {isCancelled && (
+                              <span className="px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded-full uppercase tracking-wider">
+                                Cancelled
+                              </span>
+                            )}
+                            {hasOverride && !isCancelled && override.overriddenDate && (
+                              <span className="px-2 py-0.5 bg-amber-600 text-white text-xs font-bold rounded-full uppercase tracking-wider">
+                                Rescheduled
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="text-sm text-whisky-600 flex flex-wrap gap-x-4">
+                            {!isCancelled && hasOverride && override.overriddenDate && (
+                              <span className="text-amber-800 font-medium">
+                                Originally: {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(slotDate)}
+                              </span>
+                            )}
+                            {override?.note && (
+                              <span className="italic flex items-center">
+                                <span className="mr-1">📝</span> {override.note}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {!isCancelled && (
+                            <button
+                              onClick={() => {
+                                const newDate = prompt('Enter new date (YYYY-MM-DD):', displayDate.toISOString().split('T')[0]);
+                                if (newDate) {
+                                  handleUpdateGathering(slotDateStr, {
+                                    overriddenDate: newDate,
+                                    isCancelled: false,
+                                    note: override?.note
+                                  });
+                                }
+                              }}
+                              className="px-4 py-2 bg-whisky-100 text-whisky-900 rounded-lg hover:bg-whisky-200 transition-colors font-medium border border-whisky-300 shadow-sm"
+                            >
+                              {hasOverride && override.overriddenDate ? 'Change Date' : 'Reschedule'}
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => {
+                              if (isCancelled) {
+                                handleUpdateGathering(slotDateStr, { isCancelled: false });
+                              } else {
+                                if (confirm('Are you sure you want to cancel this gathering?')) {
+                                  const note = prompt('Add a reason (optional):', override?.note || '');
+                                  handleUpdateGathering(slotDateStr, { isCancelled: true, note });
+                                }
+                              }
+                            }}
+                            className={`px-4 py-2 rounded-lg transition-colors font-medium border shadow-sm ${isCancelled
+                              ? 'bg-green-600 text-white border-green-700 hover:bg-green-700'
+                              : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                              }`}
+                          >
+                            {isCancelled ? 'Un-cancel' : 'Cancel'}
+                          </button>
+
+                          {hasOverride && (
+                            <button
+                              onClick={async () => {
+                                if (confirm('Reset to default schedule?')) {
+                                  try {
+                                    const res = await fetch(`/api/admin/gatherings/${override._id}`, { method: 'DELETE' });
+                                    if (res.ok) {
+                                      router.refresh();
+                                    }
+                                  } catch (e) {
+                                    console.error(e);
+                                  }
+                                }
+                              }}
+                              className="p-2 text-whisky-400 hover:text-whisky-900 transition-colors"
+                              title="Reset to default"
+                            >
+                              <span className="text-xl">🔄</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="bg-whisky-50 p-4 rounded-lg border border-whisky-300 mt-8">
+                <h4 className="font-bold text-whisky-900 mb-2">Note for Admin</h4>
+                <p className="text-sm text-whisky-700">
+                  Rescheduling or cancelling will update the date shown on the home page and RSVP pages.
+                  If a gathering is cancelled, the system will automatically show the next available one.
+                </p>
               </div>
             </div>
           )}
