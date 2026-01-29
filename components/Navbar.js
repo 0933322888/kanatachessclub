@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import NotificationBell from './NotificationBell';
+import { getSiteConfig } from '../lib/site-config';
 
 export default function Navbar({ session }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,14 +17,14 @@ export default function Navbar({ session }) {
           <div className="flex">
             <Link href="/" className="flex items-center space-x-2 px-2 py-2 text-xl font-bold text-amber hover:text-amber-light transition-colors">
               <Image
-                src="/logo.png"
-                alt="Kanata Chess Club Logo"
+                src={getSiteConfig().assets.logo}
+                alt={`${getSiteConfig().name} Logo`}
                 width={32}
                 height={32}
                 className="rounded"
               />
-              <span className="hidden sm:inline">Kanata Chess Club</span>
-              <span className="sm:hidden">KCC</span>
+              <span className="hidden sm:inline">{getSiteConfig().name}</span>
+              <span className="sm:hidden">{getSiteConfig().name.split(' ').map(w => w[0]).join('')}</span>
             </Link>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link href="/" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-whisky-100 hover:text-amber transition-colors">

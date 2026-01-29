@@ -5,6 +5,7 @@ import { authOptions } from '../lib/auth';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Providers from '../components/Providers';
+import { getSiteConfig } from '../lib/site-config';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const cormorant = Cormorant_Garamond({
@@ -37,14 +38,14 @@ const siteUrl = getSiteUrl();
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Kanata Chess Club',
-    template: '%s | Kanata Chess Club',
+    default: getSiteConfig().name,
+    template: `%s | ${getSiteConfig().name}`,
   },
-  description: 'A local community of chess enthusiasts in Kanata. Join us for biweekly gatherings, tournaments, and friendly matches. Free to play, all ages and abilities welcome.',
+  description: getSiteConfig().description,
   keywords: ['chess', 'chess club', 'Kanata', 'Ottawa', 'tournament', 'chess tournament', 'chess community', 'local chess', 'chess lessons', 'free chess', 'chess strategy', 'chess learning', 'kids chess'],
-  authors: [{ name: 'Kanata Chess Club' }],
-  creator: 'Kanata Chess Club',
-  publisher: 'Kanata Chess Club',
+  authors: [{ name: getSiteConfig().name }],
+  creator: getSiteConfig().name,
+  publisher: getSiteConfig().name,
   formatDetection: {
     email: false,
     address: false,
@@ -54,9 +55,9 @@ export const metadata = {
     type: 'website',
     locale: 'en_CA',
     url: siteUrl,
-    siteName: 'Kanata Chess Club',
-    title: 'Kanata Chess Club',
-    description: 'A local community of chess enthusiasts in Kanata. Join us for biweekly gatherings, tournaments, and friendly matches.',
+    siteName: getSiteConfig().name,
+    title: getSiteConfig().name,
+    description: getSiteConfig().description,
     images: [
       {
         url: `${siteUrl}/logo.svg`,
@@ -68,8 +69,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'Kanata Chess Club',
-    description: 'A local community of chess enthusiasts in Kanata. Join us for biweekly gatherings, tournaments, and friendly matches.',
+    title: getSiteConfig().name,
+    description: getSiteConfig().description,
     images: [`${siteUrl}/logo.svg`],
   },
   robots: {
@@ -95,22 +96,23 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const session = await getServerSession(authOptions);
+  const { name, description, address, gatheringDay, gatheringTime } = getSiteConfig();
+  const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][gatheringDay];
 
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'SportsClub',
-    name: 'Kanata Chess Club',
-    description: 'A local community of chess enthusiasts in Kanata, Ontario. Join us for biweekly gatherings, tournaments, and friendly matches.',
+    name: name,
+    description: description,
     url: siteUrl,
     logo: `${siteUrl}/logo.svg`,
     image: `${siteUrl}/logo.svg`,
     sameAs: [],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '8555 Campeau Dr',
-      addressLocality: 'Kanata',
+      streetAddress: address, // Helper: This might need splitting if strict schema required, but string is often okay or we parse it
+      addressLocality: 'Ottawa', // Generalizing for now
       addressRegion: 'ON',
-      postalCode: 'K2T 0K5',
       addressCountry: 'CA',
     },
     geo: {
@@ -121,9 +123,9 @@ export default async function RootLayout({ children }) {
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: 'https://schema.org/Wednesday',
-        opens: '19:00',
-        closes: '21:00',
+        dayOfWeek: `https://schema.org/${dayName}`,
+        opens: gatheringTime.split(' - ')[0], // Rough parsing
+        closes: gatheringTime.split(' - ')[1],
       },
     ],
     priceRange: 'Free',

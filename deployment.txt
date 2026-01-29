@@ -1,0 +1,37 @@
+Vercel Deployment Guide: Multi-Club Setup
+Since we have configured the application to change its content based on environment variables, you can deploy both "Kanata Chess Club" and "Barrhaven Chess Club" from the same Git repository.
+
+You will create two separate projects in Vercel, connected to the same repository, but with different Environment Variables.
+
+Prerequisites
+Your code must be pushed to a Git provider (GitHub, GitLab, or Bitbucket).
+You need a Vercel account.
+You (optional but recommended) should have two separate MongoDB connection strings if you want separate user/tournament databases.
+Step 1: Deploy "Kanata Chess Club"
+Log in to Vercel and click "Add New..." -> "Project".
+Import your kanatachess repository.
+Name the project: kanata-chess-club (or your preferred name).
+Open the Environment Variables section.
+Add the following variables:
+NEXT_PUBLIC_CLUB_ID = kanata
+MONGODB_URI = your_kanata_mongodb_connection_string
+NEXTAUTH_URL = https://kanata-chess-club.vercel.app (or your custom domain)
+NEXTAUTH_SECRET = your_generated_secret
+Click Deploy.
+Step 2: Deploy "Barrhaven Chess Club"
+Go back to the Vercel Dashboard.
+Click "Add New..." -> "Project" again.
+Import the SAME kanatachess repository.
+Name the project: barrhaven-chess-club.
+Open the Environment Variables section.
+Add the following variables (Fundamental Difference):
+NEXT_PUBLIC_CLUB_ID = barrhaven
+MONGODB_URI = your_barrhaven_mongodb_connection_string (Recommended to keep data separate)
+Tip: You can use the same Cluster, just change the database name in the URI string (e.g. .../kanata?retryWrites... vs .../barrhaven?retryWrites...)
+NEXTAUTH_URL = https://barrhaven-chess-club.vercel.app
+NEXTAUTH_SECRET = your_generated_secret (Can be same or different)
+Click Deploy.
+Result
+Project A will read NEXT_PUBLIC_CLUB_ID=kanata and display "Kanata Chess Club" with Wednesday schedules.
+Project B will read NEXT_PUBLIC_CLUB_ID=barrhaven and display "Barrhaven Chess Club" with Thursday schedules.
+Both will automatically update whenever you push changes to the main repository.

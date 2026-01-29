@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../lib/auth';
 import { getNextGatheringDate, getAllUpcomingGatherings, formatDate } from '../lib/utils';
+import { getSiteConfig } from '../lib/site-config';
 import connectDB from '../lib/mongodb';
 import User from '../models/User';
 import Tournament from '../models/Tournament';
@@ -10,10 +11,10 @@ import TournamentRegistration from '../components/TournamentRegistration';
 
 export const metadata = {
   title: 'Home',
-  description: 'Welcome to Kanata Chess Club - A local community of chess enthusiasts. Join us for biweekly gatherings, tournaments, and friendly matches. Free to play, all ages and abilities welcome.',
+  description: `Welcome to ${getSiteConfig().name} - A local community of chess enthusiasts. Join us for biweekly gatherings, tournaments, and friendly matches. Free to play, all ages and abilities welcome.`,
   openGraph: {
-    title: 'Kanata Chess Club - Home',
-    description: 'A local community of chess enthusiasts in Kanata. Join us for biweekly gatherings, tournaments, and friendly matches.',
+    title: `${getSiteConfig().name} - Home`,
+    description: `A local community of chess enthusiasts in ${getSiteConfig().name === 'Barrhaven Chess Club' ? 'Barrhaven' : 'Kanata'}. Join us for biweekly gatherings, tournaments, and friendly matches.`,
   },
 };
 
@@ -21,6 +22,7 @@ export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const nextGathering = getNextGatheringDate();
   const upcomingGatherings = getAllUpcomingGatherings(5);
+  const { name, description, gatheringTime: defaultTime, location: defaultLocation, assets } = getSiteConfig();
 
   // Get attendee count and tournaments
   let attendeeCount = 0;
@@ -43,8 +45,8 @@ export default async function HomePage() {
   }
 
   // Gathering details
-  const gatheringTime = process.env.GATHERING_TIME || '7pm - 9pm';
-  const gatheringLocation = process.env.GATHERING_LOCATION || 'Tanger Outlets Food Court';
+  const gatheringTime = process.env.GATHERING_TIME || defaultTime;
+  const gatheringLocation = process.env.GATHERING_LOCATION || defaultLocation;
 
   // Check if user is registered for each tournament
   const userId = session?.user?.id;
@@ -81,15 +83,15 @@ export default async function HomePage() {
         <div className="relative z-10 px-4 max-w-4xl mx-auto">
           <div className="flex justify-center mb-6">
             <Image
-              src="/logo.png"
-              alt="Kanata Chess Club Logo"
+              src={assets.logo}
+              alt={`${name} Logo`}
               width={100}
               height={100}
               className="rounded-full border-4 border-amber shadow-2xl"
             />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold font-serif mb-6 tracking-wide text-amber-light">
-            Kanata Chess Club
+            {name}
           </h1>
           <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto font-light leading-relaxed">
             A community of strategy, skill, and friendship. <br className="hidden sm:block" />
@@ -173,7 +175,7 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <p className="font-semibold text-whisky-900">{gatheringTime}</p>
-                    <p className="text-sm text-whisky-600">Every other Wednesday</p>
+                    <p className="text-sm text-whisky-600">Every other {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][getSiteConfig().gatheringDay]}</p>
                   </div>
                 </div>
 
