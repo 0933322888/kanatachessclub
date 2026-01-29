@@ -23,10 +23,10 @@ export default function Navbar({ session }) {
                 height={32}
                 className="rounded"
               />
-              <span className="hidden sm:inline">{getSiteConfig().name}</span>
-              <span className="sm:hidden">{getSiteConfig().name.split(' ').map(w => w[0]).join('')}</span>
+              <span className="hidden md:inline">{getSiteConfig().name}</span>
+              <span className="md:hidden">{getSiteConfig().name.split(' ').map(w => w[0]).join('')}</span>
             </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="hidden lg:ml-6 lg:flex lg:space-x-4">
               <Link href="/" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-whisky-100 hover:text-amber transition-colors">
                 Home
               </Link>
@@ -58,7 +58,7 @@ export default function Navbar({ session }) {
           </div>
           <div className="flex items-center">
             {session ? (
-              <div className="hidden sm:flex items-center space-x-3">
+              <div className="hidden lg:flex items-center space-x-3">
                 <NotificationBell />
                 {session.user.avatar ? (
                   <img
@@ -87,7 +87,7 @@ export default function Navbar({ session }) {
                 </button>
               </div>
             ) : (
-              <div className="hidden sm:flex items-center space-x-4">
+              <div className="hidden lg:flex items-center space-x-4">
                 <Link href="/auth/login" className="px-4 py-2 text-sm font-medium text-whisky-100 hover:text-amber transition-colors">
                   Login
                 </Link>
@@ -99,7 +99,7 @@ export default function Navbar({ session }) {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-whisky-100 hover:text-amber hover:bg-whisky-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber transition-colors"
+              className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-whisky-100 hover:text-amber hover:bg-whisky-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-amber transition-colors"
               aria-expanded="false"
               aria-label="Toggle navigation menu"
             >
@@ -119,7 +119,7 @@ export default function Navbar({ session }) {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="sm:hidden border-t border-whisky-700">
+        <div className="lg:hidden border-t border-whisky-700">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
               href="/"

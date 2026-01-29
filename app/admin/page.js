@@ -29,7 +29,7 @@ export default async function AdminPage() {
   const activeUsers = await User.countDocuments({ attendingNextGathering: true });
 
   // Get raw gathering slots (default schedule)
-  const gatheringSlots = getDefaultGatheringSlots(10);
+  const gatheringSlots = getDefaultGatheringSlots(10, new Date(), currentClubId);
 
   // Get all existing overrides for these slots
   const gatheringOverrides = await Gathering.find({

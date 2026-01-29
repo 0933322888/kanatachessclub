@@ -383,10 +383,11 @@ export default function AdminClient({ users, tournaments, stats, gatheringSlots,
                           {!isCancelled && (
                             <button
                               onClick={() => {
-                                const newDate = prompt('Enter new date (YYYY-MM-DD):', displayDate.toISOString().split('T')[0]);
-                                if (newDate) {
+                                const defaultVal = displayDate.toISOString().slice(0, 16).replace('T', ' ');
+                                const newDateTime = prompt('Enter new date and time (YYYY-MM-DD HH:mm):', defaultVal);
+                                if (newDateTime) {
                                   handleUpdateGathering(slotDateStr, {
-                                    overriddenDate: newDate,
+                                    overriddenDate: newDateTime,
                                     isCancelled: false,
                                     note: override?.note
                                   });
