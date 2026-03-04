@@ -37,6 +37,7 @@ const siteUrl = getSiteUrl();
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
+  applicationName: getSiteConfig().name,
   title: {
     default: getSiteConfig().name,
     template: `%s | ${getSiteConfig().name}`,
@@ -131,6 +132,15 @@ export default async function RootLayout({ children }) {
     priceRange: 'Free',
   };
 
+  const websiteStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: name,
+    url: siteUrl,
+    description: description,
+    publisher: { '@type': 'Organization', name: name },
+  };
+
   return (
     <html lang="en">
       <head>
@@ -140,6 +150,10 @@ export default async function RootLayout({ children }) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData) }}
         />
       </head>
       <body className={`${inter.variable} ${cormorant.variable} font-sans`}>
