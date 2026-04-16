@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../lib/auth';
-import { formatDate } from '../lib/utils';
+import { formatGatheringDate, gatheringCalendarParts } from '../lib/utils';
 import { getNextGatheringDate, getUpcomingGatherings } from '../lib/gatherings';
 import { getSiteConfig } from '../lib/site-config';
 import connectDB from '../lib/mongodb';
@@ -153,7 +153,7 @@ export default async function HomePage() {
                 <div>
                   <h2 className="text-2xl font-bold text-white font-serif mb-1">Next Gathering</h2>
                   <p className="text-amber-light font-medium flex items-center">
-                    <span className="mr-2">📅</span> {formatDate(nextGathering)}
+                    <span className="mr-2">📅</span> {formatGatheringDate(nextGathering)}
                   </p>
                 </div>
               </div>
@@ -212,18 +212,21 @@ export default async function HomePage() {
             </div>
 
             <div className="bg-white rounded-lg shadow-md border border-whisky-200 overflow-hidden divide-y divide-whisky-100">
-              {upcomingGatherings.map((date, index) => (
+              {upcomingGatherings.map((date, index) => {
+                const { monthShort, day } = gatheringCalendarParts(date);
+                return (
                 <div key={index} className="flex items-center p-4 hover:bg-whisky-50 transition-colors">
                   <div className="bg-whisky-100 text-whisky-800 rounded-lg p-2 text-center min-w-[60px] mr-4">
-                    <span className="block text-xs font-bold uppercase tracking-wider">{new Date(date).toLocaleString('default', { month: 'short' })}</span>
-                    <span className="block text-xl font-bold">{new Date(date).getDate()}</span>
+                    <span className="block text-xs font-bold uppercase tracking-wider">{monthShort}</span>
+                    <span className="block text-xl font-bold">{day}</span>
                   </div>
                   <div>
                     <h4 className="font-bold text-whisky-900">Regular Club Gathering</h4>
                     <p className="text-sm text-whisky-600">{gatheringTime}</p>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { formatGatheringDate, formatGatheringDateShort } from '../lib/utils';
 
 export default function AdminClient({ users, tournaments, stats, gatheringSlots, gatheringOverrides, clubId }) {
   const router = useRouter();
@@ -346,12 +347,7 @@ export default function AdminClient({ users, tournaments, stats, gatheringSlots,
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-xl font-bold text-whisky-900">
-                              {new Intl.DateTimeFormat('en-US', {
-                                weekday: 'long',
-                                month: 'long',
-                                day: 'numeric',
-                                year: 'numeric'
-                              }).format(displayDate)}
+                              {formatGatheringDate(displayDate)}
                             </span>
                             {isCancelled && (
                               <span className="px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded-full uppercase tracking-wider">
@@ -368,7 +364,7 @@ export default function AdminClient({ users, tournaments, stats, gatheringSlots,
                           <div className="text-sm text-whisky-600 flex flex-wrap gap-x-4">
                             {!isCancelled && hasOverride && override.overriddenDate && (
                               <span className="text-amber-800 font-medium">
-                                Originally: {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(slotDate)}
+                                Originally: {formatGatheringDateShort(slotDate)}
                               </span>
                             )}
                             {override?.note && (

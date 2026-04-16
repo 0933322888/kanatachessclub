@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import GatheringChat from './GatheringChat';
+import { formatGatheringDate } from '../lib/utils';
 
 // Dynamically import map to avoid SSR issues
 const LocationMap = dynamic(() => import('./LocationMap'), {
@@ -58,15 +59,6 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
     console.log('Returning initial attendees list:', attendeesList.length);
     return attendeesList;
   });
-
-  const formatDate = (dateString) => {
-    return new Intl.DateTimeFormat('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }).format(new Date(dateString));
-  };
 
   const getPlayerRating = (player) => {
     if (player.chessComData?.rapid) {
@@ -350,7 +342,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
           <div className="flex-1">
             <h2 className="text-xl sm:text-2xl font-semibold text-whisky-900 mb-2">
-              {formatDate(nextGathering)}
+              {formatGatheringDate(nextGathering)}
             </h2>
             <p className="text-base sm:text-lg text-whisky-800 mb-2 font-medium">
               {gatheringTime}

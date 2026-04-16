@@ -4,7 +4,6 @@ import { authOptions } from '../../lib/auth';
 import connectDB from '../../lib/mongodb';
 import User from '../../models/User';
 import OpponentRequest from '../../models/OpponentRequest';
-import { formatDate } from '../../lib/utils';
 import { getNextGatheringDate } from '../../lib/gatherings';
 import NextGatheringClient from '../../components/NextGatheringClient';
 import { getSiteConfig } from '../../lib/site-config';

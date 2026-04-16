@@ -1,4 +1,4 @@
-import { formatDate } from '../../lib/utils';
+import { gatheringCalendarParts } from '../../lib/utils';
 import { getUpcomingGatherings } from '../../lib/gatherings';
 import Tournament from '../../models/Tournament';
 import connectDB from '../../lib/mongodb';
@@ -58,7 +58,10 @@ export default async function CalendarPage() {
                     {allEvents.length === 0 ? (
                         <p className="text-center text-gray-600">No upcoming events scheduled at the moment.</p>
                     ) : (
-                        allEvents.map((event, index) => (
+                        allEvents.map((event, index) => {
+                            const gatheringParts =
+                                event.type === 'gathering' ? gatheringCalendarParts(event.date) : null;
+                            return (
                             <div
                                 key={index}
                                 className={`flex flex-col md:flex-row items-center p-6 rounded-lg shadow-md border-l-4 ${event.type === 'tournament' ? 'bg-amber-50 border-amber-600' : 'bg-white border-whisky-400'
@@ -66,13 +69,17 @@ export default async function CalendarPage() {
                             >
                                 <div className="flex-shrink-0 text-center md:mr-8 mb-4 md:mb-0 min-w-[100px]">
                                     <div className="text-sm font-bold uppercase tracking-wider text-gray-500">
-                                        {event.date.toLocaleString('default', { month: 'short' })}
+                                        {gatheringParts
+                                            ? gatheringParts.monthShort
+                                            : event.date.toLocaleString('default', { month: 'short' })}
                                     </div>
                                     <div className="text-3xl font-bold text-gray-900">
-                                        {event.date.getDate()}
+                                        {gatheringParts ? gatheringParts.day : event.date.getDate()}
                                     </div>
                                     <div className="text-sm text-gray-500">
-                                        {event.date.toLocaleString('default', { weekday: 'short' })}
+                                        {gatheringParts
+                                            ? gatheringParts.weekdayShort
+                                            : event.date.toLocaleString('default', { weekday: 'short' })}
                                     </div>
                                 </div>
 
@@ -103,7 +110,8 @@ export default async function CalendarPage() {
                                     )}
                                 </div>
                             </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </div>
