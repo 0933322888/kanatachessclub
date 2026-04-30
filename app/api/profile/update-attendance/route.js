@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../lib/auth';
 import connectDB from '../../../../lib/mongodb';
 import User from '../../../../models/User';
+import { getNextGatheringDate } from '../../../../lib/gatherings';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,17 @@ export async function POST(request) {
 
     if (body.attendingNextGathering !== undefined) {
       user.attendingNextGathering = body.attendingNextGathering;
+      if (body.attendingNextGathering) {
+        const targetDate = body.gatheringDate || await getNextGatheringDate();
+        const gatheringDate = new Date(targetDate);
+        if (Number.isNaN(gatheringDate.getTime())) {
+          return NextResponse.json({ error: 'Invalid gatheringDate' }, { status: 400 });
+        }
+        gatheringDate.setHours(0, 0, 0, 0);
+        user.attendingGatheringDate = gatheringDate;
+      } else {
+        user.attendingGatheringDate = null;
+      }
     }
 
     await user.save();

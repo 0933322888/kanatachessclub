@@ -266,6 +266,7 @@ export default function NextGatheringClient({ nextGathering, gatheringLocation, 
         },
         body: JSON.stringify({
           attendingNextGathering: newAttendingStatus,
+          gatheringDate: nextGathering,
         }),
       });
 

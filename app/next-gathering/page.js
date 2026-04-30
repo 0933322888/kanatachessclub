@@ -28,13 +28,21 @@ export default async function NextGatheringPage() {
 
   await connectDB();
   const nextGathering = await getNextGatheringDate();
+  const nextGatheringStart = new Date(nextGathering);
+  nextGatheringStart.setHours(0, 0, 0, 0);
 
   // Get current user's full data for attendees list
-  const currentUser = await User.findById(session.user.id).select('firstName lastName chessComData manualRating preferredStrength attendingNextGathering');
+  const currentUser = await User.findById(session.user.id).select('firstName lastName chessComData manualRating preferredStrength attendingNextGathering attendingGatheringDate');
+  const isCurrentUserAttending = Boolean(
+    currentUser?.attendingNextGathering &&
+    currentUser?.attendingGatheringDate &&
+    new Date(currentUser.attendingGatheringDate).getTime() === nextGatheringStart.getTime()
+  );
 
   // Get all users attending who are members of this club
   const attendees = await User.find({
     attendingNextGathering: true,
+    attendingGatheringDate: nextGatheringStart,
     clubs: currentClubId,
   })
     .select('_id firstName lastName chessComData manualRating preferredStrength')
@@ -66,7 +74,7 @@ export default async function NextGatheringPage() {
       gatheringTime={gatheringTime}
       gatheringCoordinates={coordinates}
       googleMapsUrl={googleMapsUrl}
-      isAttending={currentUser?.attendingNextGathering || false}
+      isAttending={isCurrentUserAttending}
       attendees={JSON.parse(JSON.stringify(attendees))}
       myRequests={JSON.parse(JSON.stringify(myRequests))}
       matchedPairs={JSON.parse(JSON.stringify(matchedPairs))}

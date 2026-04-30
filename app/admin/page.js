@@ -6,6 +6,7 @@ import User from '../../models/User';
 import Tournament from '../../models/Tournament';
 import Gathering from '../../models/Gathering';
 import AdminClient from '../../components/AdminClient';
+import { getNextGatheringDate } from '../../lib/gatherings';
 import { getDefaultGatheringSlots } from '../../lib/gatherings';
 
 export default async function AdminPage() {
@@ -26,7 +27,14 @@ export default async function AdminPage() {
   const users = await User.find().select('-password').sort({ createdAt: -1 });
   const tournaments = await Tournament.find().populate('participants').sort({ createdAt: -1 });
   const totalUsers = await User.countDocuments();
-  const activeUsers = await User.countDocuments({ attendingNextGathering: true });
+  const nextGathering = await getNextGatheringDate();
+  const nextGatheringStart = new Date(nextGathering);
+  nextGatheringStart.setHours(0, 0, 0, 0);
+  const activeUsers = await User.countDocuments({
+    attendingNextGathering: true,
+    attendingGatheringDate: nextGatheringStart,
+    clubs: currentClubId,
+  });
 
   // Get raw gathering slots (default schedule)
   const gatheringSlots = getDefaultGatheringSlots(10, new Date(), currentClubId);

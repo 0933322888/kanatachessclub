@@ -22,16 +22,23 @@ export const metadata = {
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const nextGathering = await getNextGatheringDate();
+  const nextGatheringStart = new Date(nextGathering);
+  nextGatheringStart.setHours(0, 0, 0, 0);
   const upcomingGatheringsData = await getUpcomingGatherings(5);
   const upcomingGatherings = upcomingGatheringsData.map(g => g.date);
   const { name, description, gatheringTime: defaultTime, location: defaultLocation, address, assets } = getSiteConfig();
+  const currentClubId = process.env.NEXT_PUBLIC_CLUB_ID || 'kanata';
 
   // Get attendee count and tournaments
   let attendeeCount = 0;
   let upcomingTournaments = [];
   try {
     await connectDB();
-    attendeeCount = await User.countDocuments({ attendingNextGathering: true });
+    attendeeCount = await User.countDocuments({
+      attendingNextGathering: true,
+      attendingGatheringDate: nextGatheringStart,
+      clubs: currentClubId,
+    });
 
     // Fetch upcoming tournaments (status: upcoming, eventDate in the future)
     const now = new Date();
